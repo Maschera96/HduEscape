@@ -1,0 +1,1 @@
+<view class="picture"><view data-event-opts="{{[['tap',[['goto',['$event']]]]]}}" class="box" bindtap="__e"></view><image style="height:100%;width:100%;" src="../../static/liulan.png"></image></view>

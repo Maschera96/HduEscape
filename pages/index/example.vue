@@ -1,0 +1,544 @@
+<template>
+	<view>
+		<view class="header space-between">
+			<text class="iconfont" data-id="0" bindtap='dataBefor'>
+				<text class='left color'></text>
+			</text>
+			<view class="btn flex-center" bindtap="dateSelection">
+				<view class="text">{{selectDay}}</view>
+				<text class=""></text>
+			</view>
+			<text class="iconfont" data-id="1" bindtap='dataBefor'>
+				<text class='right color'></text>
+			</text>
+		</view>
+		<view wx:if='{{!calShow}}' class="{{isOpen?'':'calendar-box'}} {{dateShow?'active':''}}">
+			<view class="calendar-wrapper {{dateShow?'active':''}}">
+				<view class="calendar-panel">
+					<view class="date-befor" data-id="0" data-type="month" bindtap='dataBefor'>
+						<text class="iconfont">
+							<text class='left color'></text>
+						</text>
+					</view>
+					<view class="calendar-panel-box">
+						<view>{{canlender.year}}年</view>
+						<view>{{canlender.month}}月</view>
+					</view>
+					<view class="date-after" data-id="1" data-type="month" bindtap='dataBefor'>
+						<text class="iconfont">
+							<text class='right color'></text>
+						</text>
+					</view>
+					<view class='backtoday' bindtap='backtoday'>
+						回到今天
+					</view>
+				</view>
+				<view class="calendar-header">
+					<view>日</view>
+					<view>一</view>
+					<view>二</view>
+					<view>三</view>
+					<view>四</view>
+					<view>五</view>
+					<view>六</view>
+				</view>
+				<view class="calendar-body">
+					<block wx:for="{{canlender.weeks}}" wx:for-item="weeks" wx:for-index="week" wx:key="weeks">
+						<view class="calender-body-date-week">
+							<block wx:for="{{weeks}}" wx:for-item="day" wx:key="day">
+								<view class="date {{canlender.month === day.month? '' : 'placeholder'}} {{(day.date==canlender.date||day.checked) && canlender.month == day.month?'date-current': ''}} "
+								 data-week="{{week}}" data-index="{{index}}" data-ischeck="{{canlender.month === day.month}}" bindtap='selectDay'>
+									{{day.date}}
+									<view wx:if="{{day.have}}" class="data-circle"></view>
+								</view>
+							</block>
+						</view>
+					</block>
+				</view>
+				<view class="packup" bindtap='packup'>确定</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	// components/calendar/calendar.js
+	/**
+	 * 日历选择组件
+	 * 2018-03-04
+	 * mehaotian
+	 * github ：https://github.com/mehaotian
+	 */
+	Component({
+		/**
+		 * 组件的属性列表
+		 * data [Date] 当前现实的月份
+		 * selected [Array] 所有被选择的天
+		 */
+		properties: {
+			date: {
+				type: null,
+				value: new Date()
+			},
+			selected: {
+				type: Array,
+				value: [],
+				observer(newVal, oldVal) {
+					this.getWeek(new Date())
+				}
+			},
+			isOpen: {
+				type: Boolean,
+				value: false,
+			}
+		},
+
+		/**
+		 * 组件的初始数据
+		 */
+		data: {
+			calShow: true, // 日历组件是否打开
+			dateShow: false, // 日期是否选择
+			selectDay: '', // 当前选择日期
+			canlender: {
+				"weeks": []
+			}
+		},
+		ready() {
+			this.getWeek(new Date())
+			if (this.data.isOpen) {
+				this.setData({
+					calShow: false,
+					dateShow: true
+				})
+			}
+		},
+		/**
+		 * 组件的方法列表
+		 */
+		methods: {
+			dateSelection() {
+				if (this.data.isOpen) {
+					return
+				}
+				let self = this;
+				if (self.data.calShow) {
+					self.setData({
+						calShow: false
+					}, () => {
+						setTimeout(() => {
+							self.setData({
+								dateShow: true
+							}, () => {
+								self.triggerEvent('select', {
+									ischeck: !self.data.calShow
+								})
+							})
+						}, 100)
+					})
+				} else {
+					self.setData({
+						dateShow: false
+					}, () => {
+						setTimeout(() => {
+							self.setData({
+								calShow: true
+							}, () => {
+								self.triggerEvent('select', {
+									ischeck: !self.data.calShow
+								})
+							})
+						}, 300)
+					})
+				}
+
+			},
+			selectDay(e) {
+
+				let index = e.currentTarget.dataset.index;
+				let week = e.currentTarget.dataset.week;
+				let ischeck = e.currentTarget.dataset.ischeck;
+				let canlender = this.data.canlender;
+				if (!ischeck) return false;
+				let month = canlender.weeks[week][index].month < 10 ? "0" + canlender.weeks[week][index].month : canlender.weeks[
+					week][index].month
+				let date = canlender.weeks[week][index].date < 10 ? "0" + canlender.weeks[week][index].date : canlender.weeks[
+					week][index].date
+				this.getWeek(canlender.year + "-" + month + "-" + date);
+
+			},
+			packup() {
+
+				let self = this;
+				if (this.data.isOpen) {
+					let year = self.data.canlender.year + "-" + self.data.canlender.month + "-" + self.data.canlender.date
+					let _date = self.getDate(year, 0);
+					self.getWeek(_date);
+					return
+				}
+				self.setData({
+					dateShow: false
+				}, () => {
+					setTimeout(() => {
+						self.setData({
+							calShow: true
+						}, () => {
+							let year = self.data.canlender.year + "-" + self.data.canlender.month + "-" + self.data.canlender.date
+							let _date = self.getDate(year, 0);
+							self.getWeek(_date);
+							self.triggerEvent('select', {
+								ischeck: !self.data.calShow
+							})
+						})
+					}, 300)
+				})
+			},
+			// 返回今天
+			backtoday() {
+				this.getWeek(new Date());
+			},
+			// 前一天|| 后一天
+			dataBefor(e) {
+				let num = 0;
+				let types = e.currentTarget.dataset.type;
+
+				if (e.currentTarget.dataset.id === "0") {
+					num = -1;
+				} else {
+					num = 1
+				}
+				let year = this.data.canlender.year + "-" + this.data.canlender.month + "-" + this.data.canlender.date
+				let _date = this.getDate(year, num, types === 'month' ? "month" : "day");
+				this.getWeek(_date);
+			},
+			// 获取日历内容
+			getWeek(dateData) {
+				let selected = this.data.selected
+				let a = new Date()
+				// console.log("im date ", a, typeof a === 'object')
+				// 判断当前是 安卓还是ios ，传入不容的日期格式
+				if (typeof dateData !== 'object') {
+					dateData = dateData.replace(/-/g, "/")
+				}
+				let _date = new Date(dateData);
+				let year = _date.getFullYear(); //年
+				let month = _date.getMonth() + 1; //月
+				let date = _date.getDate(); //日
+				let day = _date.getDay(); // 天
+				let canlender = [];
+				// console.log(selected)
+				let dates = {
+					firstDay: new Date(year, month - 1, 1).getDay(),
+					lastMonthDays: [], // 上个月末尾几天
+					currentMonthDys: [], // 本月天数
+					nextMonthDays: [], // 下个月开始几天
+					endDay: new Date(year, month, 0).getDay(),
+					weeks: []
+				}
+
+				// 循环上个月末尾几天添加到数组
+				for (let i = dates.firstDay; i > 0; i--) {
+					dates.lastMonthDays.push({
+						'date': new Date(year, month, -i).getDate() + '',
+						'month': month - 1
+					})
+				}
+				// 循环本月天数添加到数组
+				for (let i = 1; i <= new Date(year, month, 0).getDate(); i++) {
+					let have = false;
+					for (let j = 0; j < selected.length; j++) {
+						let selDate = selected[j].date.split('-');
+
+						if (Number(year) === Number(selDate[0]) && Number(month) === Number(selDate[1]) && Number(i) === Number(selDate[
+								2])) {
+							have = true;
+						}
+					}
+					dates.currentMonthDys.push({
+						'date': i + "",
+						'month': month,
+						have
+					})
+				}
+				// 循环下个月开始几天 添加到数组
+				for (let i = 1; i < 7 - dates.endDay; i++) {
+					dates.nextMonthDays.push({
+						'date': i + '',
+						'month': month + 1
+					})
+				}
+
+				canlender = canlender.concat(dates.lastMonthDays, dates.currentMonthDys, dates.nextMonthDays)
+				// 拼接数组  上个月开始几天 + 本月天数+ 下个月开始几天
+				for (let i = 0; i < canlender.length; i++) {
+					if (i % 7 == 0) {
+						dates.weeks[parseInt(i / 7)] = new Array(7);
+					}
+					dates.weeks[parseInt(i / 7)][i % 7] = canlender[i]
+				}
+
+
+				// 渲染数据
+				this.setData({
+					selectDay: month + "月" + date + "日",
+					"canlender.weeks": dates.weeks,
+					'canlender.month': month,
+					'canlender.date': date,
+					"canlender.day": day,
+					'canlender.year': year,
+				})
+				month = month < 10 ? "0" + month : month
+				date = date < 10 ? "0" + date : date
+				this.triggerEvent('getdate', {
+					year,
+					month,
+					date
+				})
+			},
+			/**
+			 * 时间计算
+			 */
+			getDate(date, AddDayCount, str = 'day') {
+				if (typeof date !== 'object') {
+					date = date.replace(/-/g, "/")
+				}
+				let dd = new Date(date)
+				switch (str) {
+					case 'day':
+						dd.setDate(dd.getDate() + AddDayCount) // 获取AddDayCount天后的日期
+						break;
+					case 'month':
+						dd.setMonth(dd.getMonth() + AddDayCount) // 获取AddDayCount天后的日期
+						break;
+					case 'year':
+						dd.setFullYear(dd.getFullYear() + AddDayCount) // 获取AddDayCount天后的日期
+						break;
+				}
+				let y = dd.getFullYear()
+				let m = (dd.getMonth() + 1) < 10 ? '0' + (dd.getMonth() + 1) : (dd.getMonth() + 1) // 获取当前月份的日期，不足10补0
+				let d = dd.getDate() < 10 ? '0' + dd.getDate() : dd.getDate() // 获取当前几号，不足10补0
+				return y + '-' + m + '-' + d
+			}
+		}
+	})
+</script>
+
+<style>
+	/* pages/calendar/calendar.wxss */
+
+	.calendar-box {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 999;
+		padding-top: 100rpx;
+		box-sizing: border-box;
+		transition: all 0.3s;
+		opacity: 0;
+	}
+
+	.calendar-box.active {
+		opacity: 1;
+	}
+
+	.calendar-wrapper {
+		width: 100%;
+		border-top: 1px #f5f5f5 solid;
+		box-sizing: border-box;
+		font-size: 26rpx;
+		background: #fff;
+		transition: all 0.3s;
+		transform: translateY(-100%);
+	}
+
+	.calendar-wrapper.active {
+		transform: translateY(0%);
+	}
+
+	.header {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		height: 100rpx;
+		/* width: 100%; */
+		background: #fff;
+		/* padding: 0 30rpx; */
+		z-index: 10000;
+	}
+
+	.top-jiantou {
+		width: 100rpx;
+		height: 100rpx;
+		text-align: center;
+		box-sizing: border-box;
+		line-height: 100rpx;
+	}
+
+	.iconfont {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		color: #52b8f5;
+		width: 53rpx;
+		height: 53rpx;
+	}
+
+	.iconfont .left,
+	.iconfont .right {
+		display: block;
+		width: 0;
+		height: 0;
+		border-top: 20rpx solid transparent;
+		border-bottom: 20rpx solid transparent;
+	}
+
+	.iconfont .left {
+		border-right: 40rpx solid transparent;
+	}
+
+	.iconfont .right {
+		border-left: 40rpx solid transparent;
+	}
+
+	.iconfont .left.color {
+		border-right-color: #52b8f5;
+	}
+
+	.iconfont .right.color {
+		border-left-color: #52b8f5;
+	}
+
+	.btn {
+		margin: 0 30rpx;
+		width: 240rpx;
+		height: 53rpx;
+		border: 1rpx solid #52b8f5;
+		border-radius: 26rpx;
+		color: #52b8f5;
+		font-size: 26rpx;
+		box-sizing: border-box;
+	}
+
+	.calendar-panel {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 32rpx;
+		height: 80rpx;
+	}
+
+	.backtoday {
+		position: absolute;
+		right: 0;
+		top: 15rpx;
+		padding: 0 10rpx;
+		padding-left: 20rpx;
+		height: 50rpx;
+		line-height: 50rpx;
+		border: 1px #52b8f5 solid;
+		border-right: none;
+		font-size: 28rpx;
+		border-top-left-radius: 50rpx;
+		border-bottom-left-radius: 50rpx;
+		color: #52b8f5;
+		background: rgba(82, 184, 245, 0.1);
+	}
+
+	.date-befor,
+	.date-after {
+		/* border: 1px red solid; */
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 80rpx;
+		width: 80rpx;
+		text-align: center;
+		line-height: 80rpx;
+		/* margin-right: 20rpx; */
+	}
+
+	/* .date-after {
+	    margin-left: 20rpx;
+	} */
+
+	.calendar-panel-box {
+		display: flex;
+	}
+
+	.calendar-header {
+		display: flex;
+	}
+
+	.calendar-header view {
+		width: 100%;
+		text-align: center;
+		line-height: 80rpx;
+		color: #52b8f5;
+	}
+
+	.calendar-body {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.calender-body-date-week {
+		display: flex;
+		width: 100%;
+		border-bottom: 1px #f5f5f5 solid;
+	}
+
+	.date {
+		position: relative;
+		width: 100%;
+		text-align: center;
+		color: #1c1c1c;
+		background: #fff;
+		line-height: 100rpx;
+	}
+
+	.date.active {
+		background: red;
+	}
+
+	.placeholder {
+		color: #a4a4a4;
+	}
+
+	.date-current {
+		background: #52b8f5;
+		color: #fff;
+	}
+
+	.data-circle {
+		position: absolute;
+		bottom: 10rpx;
+		left: 0;
+		right: 0;
+		margin: auto;
+		width: 10rpx;
+		height: 10rpx;
+		border-radius: 50%;
+		background: #ff5a5f;
+		z-index: 2;
+	}
+
+	.packup {
+		width: 100%;
+		height: 100rpx;
+		line-height: 100rpx;
+		text-align: center;
+		color: #52b8f5;
+	}
+
+	.flex-center {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+</style>

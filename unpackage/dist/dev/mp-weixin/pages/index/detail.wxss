@@ -1,0 +1,22 @@
+
+.picture {
+	width: 750rpx;
+	height: 2929rpx;
+}
+.box {
+	position: absolute;
+	left: 385rpx;
+	/* top: 1003rpx; */
+	width: 300rpx;
+	height: 150rpx;
+	font-size: 30rpx;
+	color: #3d3a3d;
+	text-align: right;
+	z-index: 1;
+
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
