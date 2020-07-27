@@ -34,8 +34,6 @@
 	"libVersion": "",
 	"appid": "wx7e17efd488dbcb1b",
 	"projectname": "离校请假",
-	"simulatorType": "wechat",
-	"simulatorPluginLibVersion": {},
 	"condition": {
 		"search": {
 			"current": -1,
@@ -45,13 +43,28 @@
 			"current": -1,
 			"list": []
 		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
 		"game": {
+			"current": -1,
+			"list": []
+		},
+		"gamePlugin": {
 			"current": -1,
 			"list": []
 		},
 		"miniprogram": {
 			"current": -1,
-			"list": []
+			"list": [
+				{
+					"id": -1,
+					"name": "pages/index/detail",
+					"pathName": "pages/index/detail",
+					"scene": null
+				}
+			]
 		}
 	}
 }

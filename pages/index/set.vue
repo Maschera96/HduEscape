@@ -24,6 +24,7 @@
 		</form>
 		<view style="margin-top: 30rpx; font-size: 30rpx; color: #999999; padding-left: 10rpx;">*每条数据均为必填，后三条数据虽有默认值，但是可修改</view>
 		<view style="margin-top: 15rpx; font-size: 30rpx; color: #999999; padding-left: 10rpx;">*新增缓存功能，不清缓存便可无需重复输入</view>
+		<view style="margin-top: 15rpx; font-size: 30rpx; color: #999999; padding-left: 10rpx;">*新增个人签名、请假时间</view>
 		<button type="primary" class="btn" style="margin-top: 80rpx; align-content: center;" @tap="goto()">提交</button>
 		<!-- <button type="primary" class="btn" style="margin-top: 80rpx; align-content: center;" @tap="gotoMark()">打卡</button> -->
 	</view>

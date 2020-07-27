@@ -1,7 +1,7 @@
 
 .picture {
 	width: 750rpx;
-	height: 2929rpx;
+	height: 3490rpx;
 }
 .box {
 	position: absolute;
@@ -18,5 +18,12 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+.sign {
+	width: 600rpx;
+	position: absolute;
+	top: 3075rpx;
+	z-index: 3;
+	margin: 0rpx 75rpx;
 }
 
